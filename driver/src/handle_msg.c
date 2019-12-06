@@ -146,7 +146,7 @@ static enum msg_cmd_response handle_erase_sector(uint8_t *buf, uint16_t len)
 
 static void msg_finish_response(struct serial *serial, enum msg_cmd_response res)
 {
-    char hex[2];
+    uint8_t hex[2];
     byte_to_hex(res, hex);
     serial_write(serial, hex[0]);
     serial_write(serial, hex[1]);

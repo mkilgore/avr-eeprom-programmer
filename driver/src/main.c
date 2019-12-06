@@ -7,9 +7,11 @@
 
 #include <avr/interrupt.h>
 
+#include "am29.h"
+
 static struct serial serial = {
     .use_2x = 1,
-    .baud_register = 3, /* This uses 250K baud */
+    .baud_register = 25, /* This uses 250K baud */
 };
 
 int main(void)

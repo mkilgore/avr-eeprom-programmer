@@ -27,7 +27,7 @@ static uint8_t nibble_to_hex(uint8_t nib)
     if (nib < 10)
         return nib + '0';
     else
-        return nib + 'A';
+        return nib + 'A' - 10;
 }
 
 void byte_to_hex(uint8_t byte, uint8_t *buf)

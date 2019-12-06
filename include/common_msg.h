@@ -1,7 +1,7 @@
 #ifndef INCLUDE_COMMON_MSG_H
 #define INCLUDE_COMMON_MSG_H
 
-#define MSG_MAX_LENGTH 1024
+#define MSG_MAX_LENGTH 512
 
 /* All messages start with this byte */
 #define MSG_ID 0xAA

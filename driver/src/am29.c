@@ -26,6 +26,8 @@ struct shift_register address_low_16 = {
 static void am29_data_set_as_input(void)
 {
     DDRB = 0;
+    PORTB = 0xF0;
+    _delay_ms(1);
 }
 
 static void am29_data_set_as_output(void)
@@ -65,12 +67,12 @@ void am29_finish(void)
     am29_teardown_gpio();
 }
 
-static int am29_get_sector(uint32_t addr)
+static uint8_t am29_get_sector(uint32_t addr)
 {
     return (addr & 0x70000) >> 16;
 }
 
-static int am29_get_addr(uint32_t addr)
+static uint16_t am29_get_addr(uint32_t addr)
 {
     return addr & 0xFFFF;
 }
@@ -112,7 +114,7 @@ static void am29_set_address(uint8_t sector, uint16_t addr)
     shift_register_write_byte(&address_low_16, addr & 0xFF);
     shift_register_latch_output(&address_low_16);
 
-    PORTC &= ~0x0F;
+    PORTC &= ~0x07;
     PORTC |= sector & 0x07;
 }
 
@@ -124,8 +126,8 @@ static uint8_t am29_read_byte_internal(uint8_t sector, uint16_t addr)
 
     am29_ce_enable();
     am29_oe_enable();
-    _delay_ms(1);
-    data = PORTB & 0xFF;
+    _delay_us(1);
+    data = PINB;
     am29_oe_disable();
     am29_ce_disable();
 
@@ -140,9 +142,9 @@ static void am29_write_byte_internal(uint8_t sector, uint16_t addr, uint8_t data
 
     am29_ce_enable();
     am29_we_enable();
-    _delay_ms(60);
+    _delay_us(0.3);
     am29_we_disable();
-    _delay_ms(60);
+    _delay_us(0.3);
     am29_ce_disable();
 }
 

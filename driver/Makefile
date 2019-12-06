@@ -18,8 +18,10 @@ AVRDUDE := avrdude
 
 SRCS := $(wildcard ./src/*.c)
 OBJS := $(SRCS:.c=.o)
+DEPS := $(SRCS:.c=.d)
+DEPS := $(foreach dep,$(DEPS),$(dir $(dep)).$(notdir $(dep)))
 
-CPPFLAGS := -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I./include
+CPPFLAGS := -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I./include -I../include
 
 CFLAGS += -Os -g -std=gnu99 -Wall
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fwrapv
@@ -34,6 +36,9 @@ all: $(TARGET).hex $(TARGET).eeprom
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -o $@ $<
+
+.%.d: %.c
+	$(CC) -MM -MP -MF $@ $(CPPFLAGS) $(CFLAGS) $(TARGET_ARCH) $< -MT $*.o -MT $@
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ -o $@
@@ -52,6 +57,7 @@ $(TARGET).elf: $(OBJS)
 clean:
 	rm -f $(OBJS)
 	rm -f $(TARGET).elf $(TARGET).hex $(TARGET).eeprom
+	rm -f $(DEPS)
 
 flash: $(TARGET).hex
 	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(AVRDUDE_MCU) $(PROGRAMMER_ARGS) -U flash:w:$<
@@ -72,4 +78,7 @@ fuses:
 show_fuses:
 	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(AVRDUDE_MCU) $(PROGRAMMER_ARGS) -nv
 
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DEPS)
+endif
 
