@@ -20,7 +20,7 @@ void progress_start(void)
     print_progress_bar(0);
 }
 
-void progress_update(int progress)
+void progress_update(int progress, int estimate_hours, int estimate_minutes)
 {
     putchar('\r');
     print_progress_bar(progress);

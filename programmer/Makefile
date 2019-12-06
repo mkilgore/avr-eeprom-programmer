@@ -8,6 +8,8 @@ CC := gcc
 
 SRCS := $(wildcard ./src/*.c)
 OBJS := $(SRCS:.c=.o)
+DEPS := $(SRCS:.c=.d)
+DEPS := $(foreach dep,$(DEPS),$(dir $(dep)).$(notdir $(dep)))
 
 CPPFLAGS := -I./include -I../include
 
@@ -21,6 +23,9 @@ all: $(TARGET)
 %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
+.%.d: %.c
+	$(CC) -MM -MP -MF $@ $(CPPFLAGS) $(CFLAGS) $< -MT $*.o -MT $@
+
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
@@ -29,4 +34,9 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS)
 	rm -f $(TARGET)
+	rm -f $(DEPS)
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DEPS)
+endif
 
